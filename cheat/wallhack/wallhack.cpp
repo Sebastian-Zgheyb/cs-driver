@@ -67,8 +67,19 @@ void wallhack::loop(HANDLE driver_handle, uintptr_t modBase) {
 
         uintptr_t entityControllerPawn = driver::read_memory<uintptr_t>(driver_handle, entityController + cs2_dumper::schemas::client_dll::CCSPlayerController::m_hPlayerPawn);
         if (!entityControllerPawn) continue;
-
+        if (entityControllerPawn == localPlayerPawn)
+            continue;
         uintptr_t entity = driver::read_memory<uintptr_t>(driver_handle, listEntry + 120 * (entityControllerPawn & 0x1ff));
+
+        BYTE friendlyTeam = driver::read_memory<BYTE>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iTeamNum);
+
+        if (friendlyTeam == team)
+            continue;
+
+        int health = driver::read_memory<int>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iHealth);
+        if (health <= 0 || health > 100)
+            continue;
+
         if (entity) buffer.emplace_back(entity);
     }
 
@@ -96,11 +107,33 @@ void wallhack::render(HANDLE driver_handle, const viewMatrix& vm, const std::vec
         vec2 head, feet;
 
         if (w2s(absOrigin, head, vm.m) && w2s(eyePos, feet, vm.m)) {
-            float width = (head.y - feet.y);
-            feet.x += width;
-            feet.y -= width;
+            float height = (head.y - feet.y);
+            height = height / 2;
+            // Shift the head and feet x-coordinates to the right by half the box width
+            head.x -= height / 2;
+            feet.x -= height / 2;
 
-            renderer::draw::box(D3DXVECTOR2{ head.x, head.y }, D3DXVECTOR2{ feet.x, feet.y }, D3DCOLOR_XRGB(255, 255, 255));
+            feet.x += height;
+            height = height / 2.5f;
+            feet.y -= height;
+            head.y += height;
+
+            float healthBarHeight(head.y - feet.y);
+            int health = driver::read_memory<int>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iHealth);
+            healthBarHeight = healthBarHeight * (float(health) / 100);
+            float healthBarTopLocation = head.y - healthBarHeight;
+
+            float flashHeight(head.y - feet.y);
+            float flashOverlayAlpha = driver::read_memory<float>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_CSPlayerPawnBase::m_flFlashOverlayAlpha);
+            flashHeight = flashHeight * (flashOverlayAlpha / 255);
+            float flashTopLocation = head.y - flashHeight;
+
+            renderer::draw::box(D3DXVECTOR2{ head.x ,head.y }, D3DXVECTOR2{ feet.x, feet.y }, D3DCOLOR_XRGB(255, 47, 28));
+
+            float LineThickness = height / 3;
+
+            renderer::draw::line(D3DXVECTOR2(feet.x, head.y), D3DXVECTOR2(feet.x, healthBarTopLocation), D3DCOLOR_XRGB(84, 255, 61));
+            renderer::draw::line(D3DXVECTOR2(head.x, head.y), D3DXVECTOR2(head.x, flashTopLocation), D3DCOLOR_XRGB(255, 255, 255));
         }
     }
 }
