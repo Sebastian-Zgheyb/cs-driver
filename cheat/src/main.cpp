@@ -4,7 +4,9 @@
 #include "../offsets/client_dll.hpp"
 #include "../offsets/offsets.hpp"
 #include "../aimbot/aimbot.h"
+#include "../wallhack/wallhack.h"
 #include "memory.h"
+#include <thread>
 
 static DWORD get_process_id(const wchar_t* process_name) {
 	DWORD process_id = 0;
@@ -144,10 +146,29 @@ int main() {
 		// code wallhack or aimbot here. hehe should be easy.
 		if (const std::uintptr_t client = get_module_base(pid, L"client.dll"); client != 0) {
 			std::cout << "Client found.\n";
-			while (true) {
-				if (GetAsyncKeyState(VK_LSHIFT))
-					aimbot::frame(driver, client);
+			// renderer stuff so pdevice works
+			HWND hwnd = window::InitWindow(GetModuleHandle(NULL));
+			if (!hwnd) return -1;
+
+			if (!renderer::init(hwnd)) {
+				renderer::destroy();
+				return -1;
 			}
+
+			std::thread read(wallhack::loop, driver, client);
+
+			while (true) {
+				wallhack::frame(driver, client);
+				
+				if (GetAsyncKeyState(VK_LSHIFT)) {
+					aimbot::frame(driver, client);
+				}
+
+			}
+
+			// clean up
+			renderer::destroy();
+			UnregisterClass(L"overlay", GetModuleHandle(NULL));
 		}
 	}
 

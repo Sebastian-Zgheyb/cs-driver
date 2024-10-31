@@ -151,6 +151,7 @@
     <ClCompile Include="memory\memory.cpp" />
     <ClCompile Include="renderer\renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="wallhack\wallhack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aimbot\aimbot.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="renderer\renderer.h" />
     <ClInclude Include="offsets\client_dll.hpp" />
     <ClInclude Include="offsets\offsets.hpp" />
+    <ClInclude Include="wallhack\wallhack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

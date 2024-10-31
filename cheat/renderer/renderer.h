@@ -6,10 +6,10 @@
 
 #include "../math/vector.h"
 
-#define WIDTH 1920
-#define HEIGHT 1080	
-#define WINDOW_W 1920
-#define WINDOW_H 1080
+#define WIDTH 2560
+#define HEIGHT 1440	
+#define WINDOW_W 2560
+#define WINDOW_H 1440
 
 namespace renderer
 {
