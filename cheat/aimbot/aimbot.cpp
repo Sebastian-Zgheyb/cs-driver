@@ -55,6 +55,13 @@ float aimbot::distance(vec3 p1, vec3 p2) {
     return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2) + pow(p1.z - p2.z, 2));
 }
 
+static bool Visible(HANDLE driver, uintptr_t localIndex, uintptr_t entityPawn)
+{
+    uintptr_t state = driver::read_memory<uintptr_t>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_entitySpottedState 
+        + cs2_dumper::schemas::client_dll::EntitySpottedState_t::m_bSpottedByMask);
+    return state & (1 << (localIndex - 1));
+}
+
 void aimbot::frame(HANDLE driver, uintptr_t module_base) {
     // Read from the game using the driver
     uintptr_t entityList = driver::read_memory<uintptr_t>(driver, module_base + cs2_dumper::offsets::client_dll::dwEntityList);
@@ -70,6 +77,27 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
     float closest_distance = -1;
     vec3 enemyPos;
 
+	int localIndex = -1;
+
+    // First pass to find local index
+    for (int i = 0; i < 32; i++) {
+        uintptr_t listEntry = driver::read_memory<uintptr_t>(driver, entityList + ((8 * (i & 0x7ff) >> 9) + 16));
+        if (!listEntry) continue;
+
+        uintptr_t entityController = driver::read_memory<uintptr_t>(driver, listEntry + 120 * (i & 0x1ff));
+        if (!entityController) continue;
+
+        uintptr_t entityControllerPawn = driver::read_memory<uintptr_t>(driver, entityController + cs2_dumper::schemas::client_dll::CCSPlayerController::m_hPlayerPawn);
+        if (!entityControllerPawn) continue;
+
+        uintptr_t entityPawn = driver::read_memory<uintptr_t>(driver, listEntry + 120 * (entityControllerPawn & 0x1ff));
+
+        if (entityPawn == localPlayerPawn) {
+            localIndex = i; 
+            continue; 
+        }
+    }
+
     for (int i = 0; i < 32; i++) {
         uintptr_t listEntry = driver::read_memory<uintptr_t>(driver, entityList + ((8 * (i & 0x7ff) >> 9) + 16));
         if (!listEntry) continue;
@@ -82,15 +110,14 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
 		
         uintptr_t entityPawn = driver::read_memory<uintptr_t>(driver, listEntry + 120 * (entityControllerPawn & 0x1ff));
 		
-		
         if (team == driver::read_memory<BYTE>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iTeamNum))
             continue;
 
         if (driver::read_memory<std::uint32_t>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iHealth) <= 0)
             continue;
-		
-		
 
+        if (!Visible(driver, localIndex, entityPawn)) continue;
+		
         vec3 entityEyePos = driver::read_memory<vec3>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_vOldOrigin) +
             driver::read_memory<vec3>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseModelEntity::m_vecViewOffset);
 
@@ -106,3 +133,4 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
     vec3 relativeAngle = (enemyPos - localEyePos).RelativeAngle();
     driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, relativeAngle);
 }
+
