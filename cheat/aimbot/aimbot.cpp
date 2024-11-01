@@ -76,7 +76,7 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
 
     float closest_distance = -1;
     vec3 enemyPos;
-
+    bool targetFound = false;
 	int localIndex = -1;
 
     // First pass to find local index
@@ -110,6 +110,8 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
 		
         uintptr_t entityPawn = driver::read_memory<uintptr_t>(driver, listEntry + 120 * (entityControllerPawn & 0x1ff));
 		
+        //if (entityPawn == localPlayerPawn) continue;
+
         if (team == driver::read_memory<BYTE>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iTeamNum))
             continue;
 
@@ -123,14 +125,18 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
 
         float current_distance = aimbot::distance(localEyePos, entityEyePos);
 
+        
         if (closest_distance < 0 || current_distance < closest_distance) {
             closest_distance = current_distance;
             enemyPos = entityEyePos;
+            targetFound = true;
         }
     }
 
     // Calculate the relative angle and write to the game's memory using the driver
-    vec3 relativeAngle = (enemyPos - localEyePos).RelativeAngle();
-    driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, relativeAngle);
+    if (targetFound) {
+        vec3 relativeAngle = (enemyPos - localEyePos).RelativeAngle();
+        driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, relativeAngle);
+    }
 }
 
