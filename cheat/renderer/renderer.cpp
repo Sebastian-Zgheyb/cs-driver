@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+
+
 HWND window::InitWindow(HINSTANCE hInstance)
 {
 	HWND hwnd = NULL;
@@ -63,16 +65,22 @@ bool renderer::init(HWND hwnd)
 
 }
 
+bool renderer::wallhackEnabled = false;
+
 void renderer::frame()
 {
 	handle_events();
-	pDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, NULL, 1.0f, 0);
+
+	// Clear the buffer to black or a transparent color
+	pDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
 	pDevice->BeginScene();
 
-	// render here
-	renderer::draw::line(D3DXVECTOR2(0, 0), D3DXVECTOR2(1920, 1080), D3DCOLOR_XRGB(255, 0, 0));
-
+	//// Only render wallhack lines if wallhackEnabled is true
+	//if (wallhackEnabled) {
+	//	renderer::draw::line(D3DXVECTOR2(0, 0), D3DXVECTOR2(1920, 1080), D3DCOLOR_XRGB(255, 0, 0));
+	//}
+	//renderer::draw::line(D3DXVECTOR2(0, 0), D3DXVECTOR2(1920, 1080), D3DCOLOR_XRGB(255, 0, 0));
 	pDevice->EndScene();
 	pDevice->Present(NULL, NULL, NULL, NULL);
 }

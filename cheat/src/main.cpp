@@ -5,6 +5,7 @@
 #include "../offsets/offsets.hpp"
 #include "../aimbot/aimbot.h"
 #include "../wallhack/wallhack.h"
+#include "../renderer/renderer.h"
 #include "memory.h"
 #include <thread>
 
@@ -125,7 +126,7 @@ namespace driver {
 
 int main() {
 	const DWORD pid = get_process_id(L"cs2.exe");
-
+	
 	if (pid == 0) {
 		std::cout << "Failed to find cs2\n";
 		std::cin.get();
@@ -158,12 +159,21 @@ int main() {
 			std::thread read(wallhack::loop, driver, client);
 
 			while (true) {
-				wallhack::frame(driver, client);
-				
+				// Toggle wallhack on or off with F1
+				if (GetAsyncKeyState(VK_F1) & 1) {
+					renderer::wallhackEnabled = !renderer::wallhackEnabled;
+					renderer::frame();  
+				}
+
+				if (renderer::wallhackEnabled) {
+					wallhack::frame(driver, client);
+				}
+
 				if (GetAsyncKeyState(VK_LSHIFT)) {
 					aimbot::frame(driver, client);
 				}
-
+				
+				Sleep(1);
 			}
 
 			// clean up
