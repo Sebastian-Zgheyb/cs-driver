@@ -1,4 +1,5 @@
 #include "wallhack.h"
+#include <algorithm>
 
 namespace driver {
     namespace codes {
@@ -107,36 +108,40 @@ void wallhack::render(HANDLE driver_handle, const viewMatrix& vm, const std::vec
         vec2 head, feet;
 
         if (w2s(absOrigin, head, vm.m) && w2s(eyePos, feet, vm.m)) {
-            float height = (head.y - feet.y);
-            height = height / 2;
-            // Shift the head and feet x-coordinates to the right by half the box width
+            float height = (head.y - feet.y) / 2;
+
+            // Center the box horizontally
             head.x -= height / 2;
             feet.x -= height / 2;
-
             feet.x += height;
+
             height = height / 2.5f;
             feet.y -= height;
             head.y += height;
 
-            float healthBarHeight(head.y - feet.y);
+            float healthBarHeight = head.y - feet.y;
             int health = driver::read_memory<int>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iHealth);
-            healthBarHeight = healthBarHeight * (float(health) / 100);
+            healthBarHeight *= (float(health) / 100);
             float healthBarTopLocation = head.y - healthBarHeight;
 
-            float flashHeight(head.y - feet.y);
+            float flashHeight = head.y - feet.y;
             float flashOverlayAlpha = driver::read_memory<float>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_CSPlayerPawnBase::m_flFlashOverlayAlpha);
-            flashHeight = flashHeight * (flashOverlayAlpha / 255);
+            flashHeight *= (flashOverlayAlpha / 255);
             float flashTopLocation = head.y - flashHeight;
 
-            renderer::draw::box(D3DXVECTOR2{ head.x ,head.y }, D3DXVECTOR2{ feet.x, feet.y }, D3DCOLOR_XRGB(255, 47, 28));
+            // Draw the box with color and thickness
+            renderer::draw::box(D3DXVECTOR2{ head.x, head.y }, D3DXVECTOR2{ feet.x, feet.y }, D3DCOLOR_XRGB(255, 47, 28), 2);
 
-            float LineThickness = height / 3;
+            // Set line thickness based on height, clamped between a minimum and maximum
+            float LineThickness = std::clamp(height / 3, 1.0f, 8.0f);
 
-            renderer::draw::line(D3DXVECTOR2(feet.x, head.y), D3DXVECTOR2(feet.x, healthBarTopLocation), D3DCOLOR_XRGB(84, 255, 61));
-            renderer::draw::line(D3DXVECTOR2(head.x, head.y), D3DXVECTOR2(head.x, flashTopLocation), D3DCOLOR_XRGB(255, 255, 255));
+            // Draw the health and flash bars with the specified line thickness
+            renderer::draw::line(D3DXVECTOR2(feet.x, head.y), D3DXVECTOR2(feet.x, healthBarTopLocation), D3DCOLOR_XRGB(84, 255, 61), LineThickness);
+            renderer::draw::line(D3DXVECTOR2(head.x, head.y), D3DXVECTOR2(head.x, flashTopLocation), D3DCOLOR_XRGB(255, 255, 255), LineThickness);
         }
     }
 }
+
 
 bool wallhack::w2s(const vec3& world, vec2& screen, const float m[16]) {
     vec4 clipCoords;

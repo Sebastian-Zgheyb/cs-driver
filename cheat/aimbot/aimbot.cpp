@@ -142,7 +142,7 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
         vec3 deltaAngle = (relativeAngle - currentViewAngle);
 
         // Scale delta angle by the smoothing factor
-        vec3 smoothedAngle = currentViewAngle + deltaAngle * 0.5;
+        vec3 smoothedAngle = currentViewAngle + deltaAngle * 0.8;
 
         // Write the smoothed angle back to the game
         driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, smoothedAngle);

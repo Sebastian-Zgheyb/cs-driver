@@ -92,20 +92,21 @@ void renderer::destroy()
 	}
 }
 
-void renderer::draw::line(D3DXVECTOR2 p1, D3DXVECTOR2 p2, D3DCOLOR color)
+void renderer::draw::line(D3DXVECTOR2 p1, D3DXVECTOR2 p2, D3DCOLOR color, float thickness)
 {
 	const D3DXVECTOR2 list[] = {
 		p1,
 		p2
 	};
 
+	mLine->SetWidth(thickness);
 	mLine->Begin();
 	mLine->Draw(list, 2, color);
 	mLine->End();
-
+	mLine->SetWidth(1.0f);
 }
 
-void renderer::draw::box(D3DXVECTOR2 tl, D3DXVECTOR2 br, D3DCOLOR color)
+void renderer::draw::box(D3DXVECTOR2 tl, D3DXVECTOR2 br, D3DCOLOR color, float thickness)
 {
 	const D3DXVECTOR2 list[] = {
 		tl,
@@ -115,9 +116,11 @@ void renderer::draw::box(D3DXVECTOR2 tl, D3DXVECTOR2 br, D3DCOLOR color)
 		tl
 	};
 
+	mLine->SetWidth(thickness); 
 	mLine->Begin();
 	mLine->Draw(list, 5, color);
 	mLine->End();
+	mLine->SetWidth(1.0f);
 }
 
 void renderer::handle_events()
