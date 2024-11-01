@@ -95,6 +95,8 @@ void wallhack::frame(HANDLE driver_handle, uintptr_t modBase) {
     // Read and render view matrix
     viewMatrix vm = driver::read_memory<viewMatrix>(driver_handle, modBase + cs2_dumper::offsets::client_dll::dwViewMatrix);
     render(driver_handle, vm, entities);
+
+    renderer::draw::text(L"Wallhack: ON", 10, 10, D3DCOLOR_XRGB(0, 255, 0));
     
     renderer::pDevice->EndScene();
     renderer::pDevice->Present(0, 0, 0, 0);

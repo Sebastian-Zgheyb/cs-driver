@@ -30,15 +30,11 @@ HWND window::InitWindow(HINSTANCE hInstance)
 	return hwnd;
 }
 
-bool renderer::init(HWND hwnd)
-{
+bool renderer::init(HWND hwnd) {
 	pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (!pD3D)
 		return false;
 
-
-
-	// set the presentation parameters
 	D3DPRESENT_PARAMETERS d3dpp = {};
 	ZeroMemory(&d3dpp, sizeof(d3dpp));
 	d3dpp.BackBufferWidth = WIDTH;
@@ -51,18 +47,35 @@ bool renderer::init(HWND hwnd)
 	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
-
-	if (FAILED(pD3D->CreateDevice(D3DADAPTER_DEFAULT,
-		D3DDEVTYPE_HAL, hwnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-		&d3dpp, &pDevice)))
+	if (FAILED(pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice)))
 		return false;
 
 	if (FAILED(D3DXCreateLine(pDevice, &mLine)))
 		return false;
 
-	return true;
+	return initFont(); 
+}
 
+void renderer::draw::text(const wchar_t* message, int x, int y, D3DCOLOR color) {
+	if (!pFont) return;
+
+	RECT rect;
+	SetRect(&rect, x, y, x + 200, y + 50); 
+	pFont->DrawText(nullptr, message, -1, &rect, DT_NOCLIP, color);
+}
+
+void renderer::destroy() {
+	releaseFont();  
+
+	if (pDevice) {
+		pDevice->Release();
+		pDevice = nullptr;
+	}
+
+	if (pD3D) {
+		pD3D->Release();
+		pD3D = nullptr;
+	}
 }
 
 bool renderer::wallhackEnabled = false;
@@ -73,32 +86,16 @@ void renderer::frame()
 
 	// Clear the buffer to black or a transparent color
 	pDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-
 	pDevice->BeginScene();
 
-	//// Only render wallhack lines if wallhackEnabled is true
-	//if (wallhackEnabled) {
-	//	renderer::draw::line(D3DXVECTOR2(0, 0), D3DXVECTOR2(1920, 1080), D3DCOLOR_XRGB(255, 0, 0));
-	//}
-	//renderer::draw::line(D3DXVECTOR2(0, 0), D3DXVECTOR2(1920, 1080), D3DCOLOR_XRGB(255, 0, 0));
+	if (!wallhackEnabled) 
+		draw::text(L"Wallhack: OFF", 10, 10, D3DCOLOR_XRGB(255, 0, 0)); 
+	
+
 	pDevice->EndScene();
 	pDevice->Present(NULL, NULL, NULL, NULL);
 }
 
-void renderer::destroy()
-{
-	if (pDevice)
-	{
-		pDevice->Release();
-		pDevice = NULL;
-	}
-
-	if (pD3D)
-	{
-		pD3D->Release();
-		pD3D = NULL;
-	}
-}
 
 void renderer::draw::line(D3DXVECTOR2 p1, D3DXVECTOR2 p2, D3DCOLOR color, float thickness)
 {
@@ -140,3 +137,16 @@ void renderer::handle_events()
 	}
 }
 
+bool renderer::initFont() {
+	if (FAILED(D3DXCreateFont(pDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Arial", &pFont))) {
+		return false;
+	}
+	return true;
+}
+
+void renderer::releaseFont() {
+	if (pFont) {
+		pFont->Release();
+		pFont = nullptr;
+	}
+}

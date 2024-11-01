@@ -16,6 +16,7 @@ namespace renderer
 	inline IDirect3D9* pD3D = nullptr;
 	inline IDirect3DDevice9* pDevice = nullptr;
 	inline ID3DXLine* mLine = nullptr;
+	inline ID3DXFont* pFont = nullptr;  
 
 	inline MSG msg;
 	inline bool running = true;
@@ -23,16 +24,18 @@ namespace renderer
 
 	bool init(HWND hwnd);
 	void destroy();
-
 	void frame();
 	void handle_events();
+
+	bool initFont(); 
+	void releaseFont();  
 
 	namespace draw
 	{
 		void line(D3DXVECTOR2 p1, D3DXVECTOR2 p2, D3DCOLOR color, float thickness = 1.0f);
 		void box(D3DXVECTOR2 tl, D3DXVECTOR2 br, D3DCOLOR color, float thickness = 1.0f);
+		void text(const wchar_t* message, int x, int y, D3DCOLOR color);  
 	}
-
 };
 
 namespace window
