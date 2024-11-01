@@ -97,7 +97,11 @@ void wallhack::frame(HANDLE driver_handle, uintptr_t modBase) {
     render(driver_handle, vm, entities);
 
     renderer::draw::text(L"Wallhack: ON", 10, 10, D3DCOLOR_XRGB(0, 255, 0));
-    
+    if (!renderer::aimbotEnabled)
+        renderer::draw::text(L"Aimbot: OFF", 10, 40, D3DCOLOR_XRGB(255, 0, 0));
+    else {
+        renderer::draw::text(L"Aimbot: ON", 10, 40, D3DCOLOR_XRGB(0, 255, 0));
+    }
     renderer::pDevice->EndScene();
     renderer::pDevice->Present(0, 0, 0, 0);
 }

@@ -164,12 +164,18 @@ int main() {
 					renderer::wallhackEnabled = !renderer::wallhackEnabled;
 					renderer::frame();  
 				}
-
-				if (renderer::wallhackEnabled) {
-					wallhack::frame(driver, client);
+				// Toggle aimbot on or off with F2
+				if (GetAsyncKeyState(VK_F2) & 1) {
+					renderer::aimbotEnabled = !renderer::aimbotEnabled;
+					renderer::frame();
+					renderer::draw::text(L"Aimbot: ON", 10, 40, D3DCOLOR_XRGB(0, 255, 0));
 				}
 
-				if (GetAsyncKeyState(VK_LSHIFT)) {
+				if (renderer::wallhackEnabled) {
+					wallhack::frame(driver, client);					
+				}
+
+				if (renderer::aimbotEnabled && GetAsyncKeyState(VK_LSHIFT)) {
 					aimbot::frame(driver, client);
 				}
 				

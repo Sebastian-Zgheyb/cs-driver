@@ -79,6 +79,7 @@ void renderer::destroy() {
 }
 
 bool renderer::wallhackEnabled = false;
+bool renderer::aimbotEnabled = false;
 
 void renderer::frame()
 {
@@ -90,6 +91,12 @@ void renderer::frame()
 
 	if (!wallhackEnabled) 
 		draw::text(L"Wallhack: OFF", 10, 10, D3DCOLOR_XRGB(255, 0, 0)); 
+
+	if (!aimbotEnabled)
+		draw::text(L"Aimbot: OFF", 10, 40, D3DCOLOR_XRGB(255, 0, 0));
+	else {
+		draw::text(L"Aimbot: ON", 10, 40, D3DCOLOR_XRGB(0, 255, 0));
+	}
 	
 
 	pDevice->EndScene();

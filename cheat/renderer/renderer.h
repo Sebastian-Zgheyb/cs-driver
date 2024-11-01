@@ -21,6 +21,7 @@ namespace renderer
 	inline MSG msg;
 	inline bool running = true;
 	extern bool wallhackEnabled;
+	extern bool aimbotEnabled;
 
 	bool init(HWND hwnd);
 	void destroy();

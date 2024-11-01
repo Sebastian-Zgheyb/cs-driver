@@ -1,5 +1,5 @@
 #include "aimbot.h"
-
+#include "../renderer/renderer.h"
 namespace driver {
 	namespace codes {
 		// Used to setup the driver.
@@ -65,6 +65,8 @@ static bool Visible(HANDLE driver, uintptr_t localIndex, uintptr_t entityPawn)
 
 void aimbot::frame(HANDLE driver, uintptr_t module_base) {
     // Read from the game using the driver
+    renderer::draw::text(L"Aimbot: ON", 10, 40, D3DCOLOR_XRGB(0, 255, 0));
+
     uintptr_t entityList = driver::read_memory<uintptr_t>(driver, module_base + cs2_dumper::offsets::client_dll::dwEntityList);
     if (!entityList) return;
 
