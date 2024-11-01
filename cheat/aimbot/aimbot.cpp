@@ -62,6 +62,7 @@ static bool Visible(HANDLE driver, uintptr_t localIndex, uintptr_t entityPawn)
     return state & (1 << (localIndex - 1));
 }
 
+
 void aimbot::frame(HANDLE driver, uintptr_t module_base) {
     // Read from the game using the driver
     uintptr_t entityList = driver::read_memory<uintptr_t>(driver, module_base + cs2_dumper::offsets::client_dll::dwEntityList);
@@ -109,8 +110,6 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
         if (!entityControllerPawn) continue;
 		
         uintptr_t entityPawn = driver::read_memory<uintptr_t>(driver, listEntry + 120 * (entityControllerPawn & 0x1ff));
-		
-        //if (entityPawn == localPlayerPawn) continue;
 
         if (team == driver::read_memory<BYTE>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iTeamNum))
             continue;
@@ -136,7 +135,27 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
     // Calculate the relative angle and write to the game's memory using the driver
     if (targetFound) {
         vec3 relativeAngle = (enemyPos - localEyePos).RelativeAngle();
-        driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, relativeAngle);
+        // Read current view angles
+        vec3 currentViewAngle = driver::read_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles);
+
+        // Calculate delta angle
+        vec3 deltaAngle = (relativeAngle - currentViewAngle);
+
+        // Scale delta angle by the smoothing factor
+        vec3 smoothedAngle = currentViewAngle + deltaAngle * 0.5;
+
+        // Write the smoothed angle back to the game
+        driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, smoothedAngle);
+
     }
 }
 
+/*
+before aimbot smoothing:
+// Calculate the relative angle and write to the game's memory using the driver
+    if (targetFound) {
+        vec3 relativeAngle = (enemyPos - localEyePos).RelativeAngle();
+        driver::write_memory<vec3>(driver, module_base + cs2_dumper::offsets::client_dll::dwViewAngles, relativeAngle);
+    }
+
+*/

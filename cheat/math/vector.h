@@ -21,6 +21,11 @@ struct vec3
 		return { this->x - other.x, this->y - other.y, this->z - other.z };
 	}
 
+	vec3 operator*(float scalar)
+	{
+		return { this->x * scalar, this->y * scalar, this->z * scalar };
+	}
+
 	vec3 RelativeAngle()
 	{
 		return {
