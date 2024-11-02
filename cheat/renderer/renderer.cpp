@@ -78,8 +78,8 @@ void renderer::destroy() {
 	}
 }
 
-bool renderer::wallhackEnabled = false;
-bool renderer::aimbotEnabled = false;
+bool renderer::wallhackEnabled = true;
+bool renderer::aimbotEnabled = true;
 
 void renderer::frame()
 {
@@ -90,12 +90,12 @@ void renderer::frame()
 	pDevice->BeginScene();
 
 	if (!wallhackEnabled) 
-		draw::text(L"Wallhack: OFF", 10, 10, D3DCOLOR_XRGB(255, 0, 0)); 
+		draw::text(L"Wallhack: OFF (F1 to toggle)", 10, 10, D3DCOLOR_XRGB(255, 0, 0)); 
 
 	if (!aimbotEnabled)
-		draw::text(L"Aimbot: OFF", 10, 40, D3DCOLOR_XRGB(255, 0, 0));
+		draw::text(L"Aimbot: OFF (F2 to toggle)", 10, 40, D3DCOLOR_XRGB(255, 0, 0));
 	else {
-		draw::text(L"Aimbot: ON", 10, 40, D3DCOLOR_XRGB(0, 255, 0));
+		draw::text(L"Aimbot: ON (F2 to toggle)", 10, 40, D3DCOLOR_XRGB(0, 255, 0));
 	}
 	
 
