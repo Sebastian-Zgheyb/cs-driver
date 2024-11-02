@@ -148,7 +148,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="aimbot\aimbot.cpp" />
-    <ClCompile Include="memory\memory.cpp" />
     <ClCompile Include="renderer\renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="wallhack\wallhack.cpp" />
@@ -156,7 +155,6 @@
   <ItemGroup>
     <ClInclude Include="aimbot\aimbot.h" />
     <ClInclude Include="math\vector.h" />
-    <ClInclude Include="memory\memory.h" />
     <ClInclude Include="renderer\renderer.h" />
     <ClInclude Include="offsets\client_dll.hpp" />
     <ClInclude Include="offsets\offsets.hpp" />

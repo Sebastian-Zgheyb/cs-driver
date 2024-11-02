@@ -4,7 +4,8 @@
 #include "../offsets/offsets.hpp"
 
 #include "../math/vector.h"
-#include "../memory/memory.h"
+#include <Windows.h>
+#include <TlHelp32.h>
 
 namespace aimbot
 {
