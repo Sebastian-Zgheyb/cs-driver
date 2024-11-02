@@ -1,11 +1,11 @@
 #include <iostream>
 #include <Windows.h>
 #include <TlHelp32.h>
-#include "../offsets/client_dll.hpp"
-#include "../offsets/offsets.hpp"
-#include "../aimbot/aimbot.h"
-#include "../wallhack/wallhack.h"
-#include "../renderer/renderer.h"
+#include "offsets/client_dll.hpp"
+#include "offsets/offsets.hpp"
+#include "aimbot/aimbot.h"
+#include "wallhack/wallhack.h"
+#include "renderer/renderer.h"
 #include "memory.h"
 #include <thread>
 

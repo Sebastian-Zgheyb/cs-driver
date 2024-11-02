@@ -149,7 +149,7 @@
   <ItemGroup>
     <ClCompile Include="aimbot\aimbot.cpp" />
     <ClCompile Include="renderer\renderer.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="wallhack\wallhack.cpp" />
   </ItemGroup>
   <ItemGroup>
