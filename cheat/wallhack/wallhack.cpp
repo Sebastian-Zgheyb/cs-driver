@@ -127,6 +127,7 @@ void wallhack::render(HANDLE driver_handle, const viewMatrix& vm, const std::vec
 
             float healthBarHeight = head.y - feet.y;
             int health = driver::read_memory<int>(driver_handle, entity + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iHealth);
+            if (health <= 0) continue;
             healthBarHeight *= (float(health) / 100);
             float healthBarTopLocation = head.y - healthBarHeight;
 
