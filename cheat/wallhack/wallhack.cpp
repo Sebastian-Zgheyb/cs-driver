@@ -53,14 +53,14 @@ namespace driver {
 }
 
 void wallhack::loop(HANDLE driver_handle, uintptr_t modBase) {
-    uintptr_t entity_list = driver::read_memory<uintptr_t>(driver_handle, modBase + cs2_dumper::offsets::client_dll::dwEntityList);
+    uintptr_t entityList = driver::read_memory<uintptr_t>(driver_handle, modBase + cs2_dumper::offsets::client_dll::dwEntityList);
     uintptr_t localPlayerPawn = driver::read_memory<uintptr_t>(driver_handle, modBase + cs2_dumper::offsets::client_dll::dwLocalPlayerPawn);
     BYTE team = driver::read_memory<BYTE>(driver_handle, localPlayerPawn + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iTeamNum);
 
     std::vector<uintptr_t> buffer;
 
     for (int i = 1; i < 32; i++) {
-        uintptr_t listEntry = driver::read_memory<uintptr_t>(driver_handle, entity_list + ((8 * (i & 0x1ff) >> 9) + 16));
+        uintptr_t listEntry = driver::read_memory<uintptr_t>(driver_handle, entityList + ((8 * (i & 0x1ff) >> 9) + 16));
         if (!listEntry) continue;
 
         uintptr_t entityController = driver::read_memory<uintptr_t>(driver_handle, listEntry + 120 * (i & 0x1ff));
