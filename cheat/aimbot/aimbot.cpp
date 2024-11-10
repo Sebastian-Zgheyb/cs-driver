@@ -111,7 +111,7 @@ void aimbot::frame(HANDLE driver, uintptr_t module_base) {
         if (driver::read_memory<std::uint32_t>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseEntity::m_iHealth) <= 0)
             continue;
 
-        if (!Visible(driver, localIndex, entityPawn)) continue;
+      //  if (!Visible(driver, localIndex, entityPawn)) continue;
 
         vec3 entityEyePos = driver::read_memory<vec3>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_vOldOrigin) +
             driver::read_memory<vec3>(driver, entityPawn + cs2_dumper::schemas::client_dll::C_BaseModelEntity::m_vecViewOffset);
